@@ -20,7 +20,7 @@ export default async function LandingPage() {
 
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-32 pb-20 md:pt-40 md:pb-32">
+      <section className="relative overflow-hidden pt-32 pb-20 md:pt-30 md:pb-32">
         <div className="absolute inset-0">
           <div className="absolute -left-40 top-0 h-125 w-125 rounded-full bg-teal-500/10 blur-3xl" />
           <div className="absolute -right-40 top-40 h-150 w-150 rounded-full bg-blue-900/10 blur-3xl" />
@@ -31,7 +31,7 @@ export default async function LandingPage() {
 
             {/* LEFT — Content (2/3) */}
             <div className="lg:col-span-2">
-              <h1 className="mb-6 bg-linear-to-r from-gray-900 via-blue-900 to-teal-700 bg-clip-text text-5xl font-extrabold leading-tight text-transparent md:text-6xl">
+              <h1 className="mb-6 bg-linear-to-r from-gray-900 via-blue-900 to-teal-700 bg-clip-text text-3xl font-bold leading-tight text-transparent md:text-5xl">
                 Discover & Manage<br />Events Effortlessly
               </h1>
 

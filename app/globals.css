@@ -18,8 +18,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-space), "Helvetica Neue", sans-serif;
-  --font-display: var(--font-bricolage), "Arial Black", sans-serif;
+  --font-sans: var(--font-sans), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-display), system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   /* Custom Colors */
@@ -65,3 +65,19 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Typography system */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+/* Better heading scale */
+h1 { font-weight: 800; }
+h2 { font-weight: 700; }
+h3 { font-weight: 700; }

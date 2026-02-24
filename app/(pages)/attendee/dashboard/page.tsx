@@ -223,7 +223,7 @@ export default async function AttendeeDashboard() {
                                                 <div className="flex items-center gap-2 text-xs text-steel-gray">
                                                     <span>Registered: {new Date(ticket.createdAt).toLocaleDateString()}</span>
                                                     <span>•</span>
-                                                    <span className="font-mono">ID: {ticket.id.split('-')[0].to()}</span>
+                                                    <span className="font-mono">ID: {ticket.id.split('-')[0].toUpperCase()}</span>
                                                 </div>
                                             </div>
                                         </div>
