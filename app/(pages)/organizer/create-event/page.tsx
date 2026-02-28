@@ -12,7 +12,7 @@ export default async function CreateEventPage() {
     }
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-[#FFF7ED]">
             <CreateEventForm />
         </div>
     );

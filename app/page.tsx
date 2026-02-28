@@ -14,25 +14,24 @@ export default async function LandingPage() {
   });
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-white to-gray-50 font-sans text-gray-700">
-      {/* Navbar*/}
+    <div className="bg-linear-to-b from-white to-gray-50 font-sans text-gray-700">
       <CursorHighlight />
 
-
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-32 pb-20 md:pt-30 md:pb-32">
-        <div className="absolute inset-0">
+      {/* ── HERO ─────────────────────────────────────────────────────── */}
+      <section className="min-h-screen relative overflow-hidden flex items-center">
+        {/* Blobs */}
+        <div className="absolute inset-0 pointer-events-none">
           <div className="absolute -left-40 top-0 h-125 w-125 rounded-full bg-teal-500/10 blur-3xl" />
           <div className="absolute -right-40 top-40 h-150 w-150 rounded-full bg-blue-900/10 blur-3xl" />
         </div>
 
-        <div className="relative mx-auto max-w-7xl px-6">
+        <div className="relative mx-auto max-w-7xl px-6 py-32 w-full">
           <div className="grid items-center gap-12 lg:grid-cols-3">
 
-            {/* LEFT — Content (2/3) */}
+            {/* LEFT — Content */}
             <div className="lg:col-span-2">
               <h1 className="mb-6 bg-linear-to-r from-gray-900 via-blue-900 to-teal-700 bg-clip-text text-3xl font-bold leading-tight text-transparent md:text-5xl">
-                Discover & Manage<br />Events Effortlessly
+                Discover &amp; Manage<br />Events Effortlessly
               </h1>
 
               <p className="mb-10 max-w-2xl text-xl leading-relaxed text-gray-600">
@@ -44,13 +43,13 @@ export default async function LandingPage() {
               <div className="flex flex-wrap items-center gap-4">
                 <Link
                   href="/events"
-                  className="relative overflow-hidden border-2 border-gray-900 bg-transparent px-8 py-4 font-sans text-lg font-bold  tracking-wider text-gray-900 transition-all hover:bg-gray-900 hover:text-white"
+                  className="relative overflow-hidden border-2 border-gray-900 bg-transparent px-8 py-4 font-sans text-lg font-bold tracking-wider text-gray-900 transition-all hover:bg-gray-900 hover:text-white"
                 >
                   <span className="relative z-10">Browse Events</span>
                 </Link>
                 <Link
                   href="/organizer/create-event"
-                  className="relative overflow-hidden border-2 border-signal-orange bg-signal-orange px-8 py-4 font-sans text-lg font-bold  tracking-wider text-white transition-all hover:bg-transparent hover:text-signal-orange"
+                  className="relative overflow-hidden border-2 border-signal-orange bg-signal-orange px-8 py-4 font-sans text-lg font-bold tracking-wider text-white transition-all hover:bg-transparent hover:text-signal-orange"
                 >
                   <span className="relative z-10">Create Event</span>
                 </Link>
@@ -73,24 +72,18 @@ export default async function LandingPage() {
               </div>
             </div>
 
-            {/* RIGHT — Visual (1/3) */}
+            {/* RIGHT — Visual */}
             <div className="relative hidden lg:block">
-
-              {/* Brand label */}
-              <span className="mb-4 inline-block border-2 border-gray-900 px-4 py-1 text-sm font-bold  tracking-wider text-gray-900 bg-white">
+              <span className="mb-4 inline-block border-2 border-gray-900 px-4 py-1 text-sm font-bold tracking-wider text-gray-900 bg-white">
                 EventOps
               </span>
 
-
               <div className="relative border-2 border-gray-900 bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                {/* Fake dashboard header */}
                 <div className="flex items-center gap-2 border-b-2 border-gray-100 p-4 bg-gray-50">
                   <div className="h-3 w-3 border border-gray-900 bg-gray-900" />
                   <div className="h-3 w-3 border border-gray-900 bg-transparent" />
                   <div className="h-3 w-3 border border-gray-900 bg-transparent" />
                 </div>
-
-                {/* Fake dashboard body */}
                 <div className="space-y-4 p-6">
                   <div className="h-4 w-3/4 border border-gray-200 bg-gray-100" />
                   <div className="h-24 border-2 border-teal-500/20 bg-teal-50" />
@@ -101,10 +94,9 @@ export default async function LandingPage() {
                 </div>
               </div>
 
-              {/* Floating stat card */}
               <div className="absolute -bottom-10 -left-10 border-2 border-gray-900 bg-gray-900 px-6 py-4 text-white shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)]">
-                <div className="text-xs font-bold  tracking-wider opacity-80">Live Attendees</div>
-                <div className="text-2xl font-bold font-mono">1,248</div>
+                <div className="text-xs font-bold tracking-wider opacity-80">Live Attendees</div>
+                <div className="text-2xl font-bold font-sans">1,248</div>
               </div>
             </div>
 
@@ -112,12 +104,12 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/*Organizer section*/}
-      <section className="bg-gray-900 py-24 text-white">
-        <div className="mx-auto max-w-7xl px-6">
+      {/* ── FEATURES ─────────────────────────────────────────────────── */}
+      <section className="min-h-screen bg-gray-900 text-white flex items-center">
+        <div className="mx-auto max-w-7xl px-6 py-24 w-full">
           <div className="mb-20 text-center">
-            <h2 className="mb-4 text-4xl font-bold tracking-tight md:text-5xl">
-              Built for Organizers & Attendees
+            <h2 className="mb-4 text-4xl font-bold tracking-tight text-white md:text-5xl">
+              Built for Organizers &amp; Attendees
             </h2>
             <p className="mx-auto max-w-2xl text-xl text-gray-300">
               One platform. End-to-end event management.
@@ -127,17 +119,14 @@ export default async function LandingPage() {
           <div className="grid gap-8 md:grid-cols-3">
             {[
               {
-                icon: 'Ticket',
                 title: 'Easy Ticketing',
                 description: 'Sell tickets, generate QR codes, simulate payments — all in one place.'
               },
               {
-                icon: 'Chart',
                 title: 'Real-time Analytics',
                 description: 'Live dashboard with attendee count, revenue, and check-in stats via WebSockets.'
               },
               {
-                icon: 'Check',
                 title: 'Secure Check-in',
                 description: 'Mobile-friendly QR scanner for staff. Instant validation & entry updates.'
               }
@@ -147,7 +136,7 @@ export default async function LandingPage() {
                 className="group relative overflow-hidden border-l-4 border-signal-orange bg-white/5 p-8 transition-all hover:border-signal-orange hover:bg-white/10"
               >
                 <div className="absolute top-0 right-0 h-4 w-4 border-t border-r border-white/20" />
-                <h3 className="mb-4 font-sans text-2xl font-bold tracking-tight  text-signal-orange">{feature.title}</h3>
+                <h3 className="mb-4 font-sans text-2xl font-bold tracking-tight text-signal-orange">{feature.title}</h3>
                 <p className="text-gray-300 font-sans border-l border-white/10 pl-4">{feature.description}</p>
               </div>
             ))}
@@ -155,12 +144,12 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* Trending & Featured Events*/}
-      <section className="py-20 md:py-32">
-        <div className="mx-auto max-w-7xl px-6">
+      {/* ── TRENDING & FEATURED ──────────────────────────────────────── */}
+      <section className="min-h-screen flex items-center">
+        <div className="mx-auto max-w-7xl px-6 py-24 w-full">
           <div className="mb-16 text-center">
-            <h2 className="mb-4 text-4xl font-bold tracking-tight text-gray-900 md:text-5xl">
-              Trending & Featured Events
+            <h2 className="mb-4 text-4xl font-bold tracking-tight text-black md:text-5xl">
+              Trending &amp; Featured Events
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-gray-600">
               Discover what's happening near you right now
@@ -179,7 +168,7 @@ export default async function LandingPage() {
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <div className="relative aspect-video overflow-hidden bg-linear-to-br from-gray-100 to-gray-200">
-                    <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent"></div>
+                    <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent" />
                     {event.image && event.image !== '/placeholder-1.jpg' && (
                       <img src={event.image} alt={event.title} className="absolute inset-0 h-full w-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500" />
                     )}
@@ -195,7 +184,7 @@ export default async function LandingPage() {
 
                   <div className="p-6">
                     <div className="mb-3 flex items-center justify-between">
-                      <span className="inline-flex items-center gap-1.5 border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-bold  tracking-wider text-teal-900">
+                      <span className="inline-flex items-center gap-1.5 border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-bold tracking-wider text-teal-900">
                         {event.category}
                       </span>
                       <div className="flex items-center gap-1 text-xs text-gray-500">
@@ -224,7 +213,7 @@ export default async function LandingPage() {
                       </div>
                       <Link
                         href={`/event/${event.id}`}
-                        className="inline-flex items-center gap-1 border-2 border-gray-900 bg-gray-900 px-4 py-2 text-sm font-bold  tracking-wider text-white transition hover:bg-white hover:text-gray-900"
+                        className="inline-flex items-center gap-1 border-2 border-gray-900 bg-gray-900 px-4 py-2 text-sm font-bold tracking-wider text-white transition hover:bg-white hover:text-gray-900"
                       >
                         View Details
                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -241,9 +230,9 @@ export default async function LandingPage() {
           <div className="mt-16 text-center">
             <Link
               href="/events"
-              className="group inline-flex items-center gap-2 border-b-2 border-teal-600 pb-1 font-sans text-lg font-bold text-teal-700  tracking-widest transition-all hover:bg-teal-50 hover:px-4"
+              className="group inline-flex items-center gap-2 border-b-2 border-teal-600 pb-1 font-sans text-lg font-bold text-teal-700 tracking-widest transition-all hover:bg-teal-50 hover:px-4"
             >
-              Explore All Operations
+              Explore All Events
               <svg className="h-5 w-5 transition-transform group-hover:translate-x-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
@@ -252,12 +241,12 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
+      {/* ── FOOTER ───────────────────────────────────────────────────── */}
       <footer className="border-t-2 border-gray-200 bg-white py-12">
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <span className="text-xl font-extrabold  tracking-tighter text-gray-900">EventOps</span>
-            <p className="text-sm font-medium text-gray-500  tracking-wider">
+            <span className="text-xl font-extrabold tracking-tighter text-gray-900">EventOps</span>
+            <p className="text-sm font-medium text-gray-500 tracking-wider">
               © 2026 EventOps. All rights reserved.
             </p>
           </div>

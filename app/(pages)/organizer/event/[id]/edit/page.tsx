@@ -5,6 +5,7 @@ import { getAuthOptions } from "@/lib/auth";
 import { notFound, redirect } from "next/navigation";
 import CreateEventForm from '@/components/CreateEventForm';
 import Link from 'next/link';
+import { unpackEventDescription } from '@/lib/event-details';
 
 export default async function EditEventPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -26,10 +27,12 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
     // Check if organizer
     const isOrganizer = event.organizers.some(o => o.id === session.user.id);
     if (!isOrganizer) {
-        redirect("/organizer/dashboard?error=unauthorized"); // Better handling later
+        redirect("/organizer/dashboard?error=unauthorized");
     }
 
-    // Transform data for form
+    // Unpack agenda/speakers/policies packed inside the description string
+    const unpacked = unpackEventDescription(event.description || '');
+
     const initialData = {
         title: event.title,
         tagline: event.tagline || '',
@@ -38,11 +41,14 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
         time: event.time || '',
         location: event.location?.split('|')[0] || '',
         coordinates: event.location?.split('|')[1] || '',
-        description: event.description || '',
+        description: unpacked.overview || '',
         image: event.image || '',
         capacity: event.capacity,
         price: event.price || '',
         isFree: event.isFree,
+        policies: unpacked.policies || '',
+        agenda: unpacked.agenda ?? [],
+        speakers: unpacked.speakers ?? [],
     };
 
     return (

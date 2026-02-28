@@ -52,7 +52,7 @@ interface CreateEventFormProps {
 
 export default function CreateEventForm({ initialData, isEditMode = false, eventId }: CreateEventFormProps) {
     const [step, setStep] = useState(1);
-    const [formData, setFormData] = useState<EventFormData>(initialData || {
+    const defaultFormData: EventFormData = {
         title: '',
         tagline: '',
         category: CATEGORIES[0] || 'Technology',
@@ -60,13 +60,21 @@ export default function CreateEventForm({ initialData, isEditMode = false, event
         time: '',
         location: '',
         description: '',
-        image: '/placeholder-1.jpg', // Default for now
+        image: '/placeholder-1.jpg',
         capacity: 100,
         price: '',
         isFree: false,
         policies: '',
         agenda: [],
-        speakers: []
+        speakers: [],
+    };
+
+    const [formData, setFormData] = useState<EventFormData>({
+        ...defaultFormData,
+        ...initialData,
+        // Always guarantee arrays are never undefined even if initialData omits them
+        agenda: initialData?.agenda ?? [],
+        speakers: initialData?.speakers ?? [],
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -83,6 +91,25 @@ export default function CreateEventForm({ initialData, isEditMode = false, event
 
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [imageUploading, setImageUploading] = useState(false);
+    const [imageUploadError, setImageUploadError] = useState('');
+
+    const handleImageUpload = async (file: File) => {
+        setImageUploading(true);
+        setImageUploadError('');
+        try {
+            const fd = new FormData();
+            fd.append('file', file);
+            const res = await fetch('/api/upload', { method: 'POST', body: fd });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Upload failed');
+            setFormData(prev => ({ ...prev, image: data.url }));
+        } catch (err) {
+            setImageUploadError(err instanceof Error ? err.message : 'Upload failed');
+        } finally {
+            setImageUploading(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -395,29 +422,104 @@ export default function CreateEventForm({ initialData, isEditMode = false, event
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="block text-sm font-bold text-charcoal-blue  tracking-wider">Cover Image URL</label>
-                                            <input
-                                                type="text"
-                                                name="image"
-                                                value={formData.image}
-                                                onChange={handleChange}
-                                                placeholder="https://..."
-                                                className="w-full px-4 py-3 border-2 border-soft-slate focus:border-charcoal-blue focus:ring-0 outline-none transition-all bg-white text-charcoal-blue placeholder:text-steel-gray/50"
-                                            />
-                                            {formData.image && formData.image !== '/placeholder-1.jpg' && (
-                                                <div className="mt-2 w-full h-40 bg-soft-slate rounded overflow-hidden border-2 border-soft-slate relative group">
-                                                    <img
-                                                        src={formData.image}
-                                                        alt="Preview"
-                                                        className="w-full h-full object-cover"
-                                                        onError={(e) => {
-                                                            (e.target as HTMLImageElement).src = '/placeholder-1.jpg'; // Fallback
+                                            <div className="flex items-center justify-between">
+                                                <label className="block text-sm font-bold text-charcoal-blue tracking-wider">Cover Image</label>
+                                                {formData.image && formData.image !== '/placeholder-1.jpg' && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setFormData(prev => ({ ...prev, image: '/placeholder-1.jpg' }))}
+                                                        className="text-xs text-steel-gray hover:text-red-500 transition-colors font-medium"
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            {/* Upload zone */}
+                                            {(!formData.image || formData.image === '/placeholder-1.jpg') ? (
+                                                <label
+                                                    htmlFor="cover-image-upload"
+                                                    onDragOver={(e) => e.preventDefault()}
+                                                    onDrop={(e) => {
+                                                        e.preventDefault();
+                                                        const file = e.dataTransfer.files[0];
+                                                        if (file) handleImageUpload(file);
+                                                    }}
+                                                    className={`flex flex-col items-center justify-center w-full h-48 border-2 border-dashed cursor-pointer transition-all
+                                                        ${imageUploading
+                                                            ? 'border-signal-orange bg-signal-orange/5'
+                                                            : 'border-soft-slate bg-off-white hover:border-charcoal-blue hover:bg-white'
+                                                        }`}
+                                                >
+                                                    <input
+                                                        id="cover-image-upload"
+                                                        type="file"
+                                                        accept="image/*"
+                                                        className="sr-only"
+                                                        disabled={imageUploading}
+                                                        onChange={(e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) handleImageUpload(file);
                                                         }}
                                                     />
-                                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-xs font-bold  tracking-wider">
-                                                        Preview
+                                                    {imageUploading ? (
+                                                        <>
+                                                            <svg className="animate-spin h-8 w-8 text-signal-orange mb-3" fill="none" viewBox="0 0 24 24">
+                                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                                                            </svg>
+                                                            <p className="text-sm font-bold text-signal-orange tracking-wide">Uploading...</p>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <svg className="h-10 w-10 text-steel-gray/40 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                            </svg>
+                                                            <p className="text-sm font-bold text-charcoal-blue">Drop image here or <span className="text-signal-orange">browse</span></p>
+                                                            <p className="text-xs text-steel-gray/60 mt-1">PNG, JPG, WEBP up to 10MB · Auto-cropped to 1200×630</p>
+                                                        </>
+                                                    )}
+                                                </label>
+                                            ) : (
+                                                /* Preview */
+                                                <div className="relative w-full h-48 border-2 border-soft-slate overflow-hidden group">
+                                                    <img
+                                                        src={formData.image}
+                                                        alt="Cover preview"
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <label htmlFor="cover-image-replace" className="cursor-pointer px-4 py-2 bg-white text-charcoal-blue text-xs font-bold tracking-wider hover:bg-off-white transition-colors">
+                                                            Replace Image
+                                                        </label>
+                                                        <input
+                                                            id="cover-image-replace"
+                                                            type="file"
+                                                            accept="image/*"
+                                                            className="sr-only"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) handleImageUpload(file);
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    {/* Uploaded badge */}
+                                                    <div className="absolute top-2 left-2 flex items-center gap-1.5 bg-black/60 px-2 py-1 text-white">
+                                                        <svg className="h-3 w-3 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                        </svg>
+                                                        <span className="text-[10px] font-bold tracking-wider text-green-400">Uploaded to Cloudinary</span>
                                                     </div>
                                                 </div>
+                                            )}
+
+                                            {imageUploadError && (
+                                                <p className="text-xs font-semibold text-red-500 flex items-center gap-1.5">
+                                                    <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                    </svg>
+                                                    {imageUploadError}
+                                                </p>
                                             )}
                                         </div>
                                         <div className="space-y-2">

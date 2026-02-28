@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import InviteOrganizerPanel from './InviteOrganizerPanel';
 
 // Types matching what we expect from the server
 interface Attendee {
@@ -53,10 +54,10 @@ export default function OrganizerEventView({ event, attendees, stats }: Organize
     const percentSold = stats.capacity > 0 ? Math.round((stats.sold / stats.capacity) * 100) : 0;
 
     return (
-        <div className="min-h-screen bg-off-white font-sans text-steel-gray pt-16">
+        <div className="min-h-screen bg-[#FFF7ED] font-sans text-steel-gray pt-16">
 
             {/*PAGE HEADER*/}
-            <div className="bg-white border-b-2 border-soft-slate">
+            <div className="bg-white/70 backdrop-blur-sm border-b border-[#f5dcbf]">
                 <div className="mx-auto max-w-7xl px-6 py-8">
 
                     {/* Back + status */}
@@ -147,7 +148,7 @@ export default function OrganizerEventView({ event, attendees, stats }: Organize
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
 
                             {/* Revenue — hero */}
-                            <div className="lg:col-span-2 bg-charcoal-blue relative overflow-hidden">
+                            <div className="lg:col-span-2 bg-charcoal-blue relative overflow-hidden rounded-2xl">
                                 <div className="absolute inset-0 opacity-[0.04]" style={{
                                     backgroundImage: `repeating-linear-gradient(45deg, white 0, white 1px, transparent 0, transparent 50%)`,
                                     backgroundSize: '20px 20px'
@@ -415,6 +416,9 @@ export default function OrganizerEventView({ event, attendees, stats }: Organize
                                 </Link>.
                             </p>
                         </div>
+
+                        {/* Invite co-organizers */}
+                        <InviteOrganizerPanel eventId={event.id} />
 
                         {/* Danger zone */}
                         <div className="bg-white border-2 border-red-200">

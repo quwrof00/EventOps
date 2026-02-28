@@ -1,18 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --background: #F9FAFB;
-  /* Off-White as default background */
-  --foreground: #1F2A37;
-  /* Charcoal Blue as default text */
+  --background: #ffffff;
+  --foreground: #171717;
 
-  /* User Palette */
+  /* Brand Palette */
   --color-charcoal-blue: #1F2A37;
-  --color-steel-gray: #4B5563;
+  --color-steel-gray: #64748B;
   --color-muted-teal: #0F766E;
   --color-signal-orange: #C2410C;
   --color-off-white: #F9FAFB;
-  --color-soft-slate: #E5E7EB;
+  --color-soft-slate: #E2E8F0;
+
+  /* Page surface tints */
+  --color-attendee-surface: #F0FDFA;
+  --color-organizer-surface: #FFF7ED;
 }
 
 @theme inline {
@@ -20,7 +22,6 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans), system-ui, -apple-system, sans-serif;
   --font-display: var(--font-display), system-ui, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   /* Custom Colors */
   --color-charcoal-blue: var(--color-charcoal-blue);
@@ -29,25 +30,8 @@
   --color-signal-orange: var(--color-signal-orange);
   --color-off-white: var(--color-off-white);
   --color-soft-slate: var(--color-soft-slate);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    /* Optional: We can define dark mode equivalents if needed, but user gave specific hex codes. 
-       Usually these specific colors are for a specific look. 
-       The user said "Tone: clean, confident, modern...". 
-       I will stick to the provided palette as the base.
-       If they want dark mode, they usually provide a dark palette or we map these.
-       For now, I'll override the default dark mode vars to stick to the design or keep them safe.
-       Actually, let's just comment out the default dark mode override or adjust it to be compatible.
-       The user gave specific hex codes for "Neutral / Background" to be Off-White/Soft Slate.
-       Using a white-ish background in dark mode would be blinding.
-       However, the user prompt implies a light theme ("Off-White" background).
-       I will assume Light Mode is the primary target or force it for now given the specific colors.
-    */
-    --background: #F9FAFB;
-    --foreground: #1F2A37;
-  }
+  --color-attendee-surface: var(--color-attendee-surface);
+  --color-organizer-surface: var(--color-organizer-surface);
 }
 
 body {
@@ -66,9 +50,13 @@ body {
   scrollbar-width: none;
 }
 
-/* Typography system */
-
-h1, h2, h3, h4, h5, h6 {
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-display);
   letter-spacing: -0.02em;
 }
@@ -77,7 +65,14 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Better heading scale */
-h1 { font-weight: 800; }
-h2 { font-weight: 700; }
-h3 { font-weight: 700; }
+h1 {
+  font-weight: 800;
+}
+
+h2 {
+  font-weight: 700;
+}
+
+h3 {
+  font-weight: 700;
+}
