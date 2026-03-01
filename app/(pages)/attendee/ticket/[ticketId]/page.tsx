@@ -24,7 +24,7 @@ export default async function MyTicketPage({
 
   if (!ticket) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F0FDFA]">
+      <div className="min-h-screen flex items-center justify-center bg-[#E8F8F5]">
         <div className="text-center bg-white border border-gray-100 p-14 max-w-sm w-full mx-4">
           <div className="w-12 h-12 bg-gray-100 flex items-center justify-center mx-auto mb-5">
             <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -73,7 +73,7 @@ export default async function MyTicketPage({
   const displayLocation = locationParts[0] || "TBD";
 
   return (
-    <div className="min-h-screen bg-[#F0FDFA] font-sans text-steel-gray pt-16">
+    <div className="min-h-screen bg-[#E8F8F5] font-sans text-steel-gray pt-16">
 
       {/* PAGE HEADER */}
       <div className="bg-white/70 backdrop-blur-sm border-b border-[#ccf0ea]">

@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Syne, Inter } from "next/font/google";
+import { Plus_Jakarta_Sans, Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import { Providers } from "@/components/Providers";
 import { ToastProvider } from "@/components/ToastProvider";
 
-const syne = Syne({
+const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-display",
   subsets: ["latin"],
   weight: ["500", "600", "700", "800"],
@@ -29,7 +29,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${syne.variable} ${inter.variable} antialiased`}>
+      <body className={`${plusJakartaSans.variable} ${inter.variable} antialiased`}>
         <Providers>
           <ToastProvider>
             <Navbar />

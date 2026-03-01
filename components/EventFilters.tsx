@@ -29,7 +29,7 @@ export default function EventFilters() {
     };
 
     return (
-        <div className="sticky top-24 border-2 border-gray-200 bg-white relative overflow-hidden shadow-sm">
+        <div className="sticky top-24 border-2 border-gray-200 bg-white relative overflow-y-auto h-[calc(100vh-8rem)] custom-scrollbar transition hover:border-charcoal-blue hover:shadow-[4px_4px_0px_0px_rgba(31,42,55,1)]">
             {/* Teal top accent bar */}
             <div className="absolute top-0 left-0 right-0 h-[3px] bg-muted-teal" />
 

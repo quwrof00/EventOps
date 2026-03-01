@@ -14,7 +14,7 @@ export default async function LandingPage() {
   });
 
   return (
-    <div className="bg-linear-to-b from-white to-gray-50 font-sans text-gray-700">
+    <div className="bg-linear-to-b from-[#F4F7F9] to-[#EDF1F5] font-sans text-gray-700">
       <CursorHighlight />
 
       {/* ── HERO ─────────────────────────────────────────────────────── */}

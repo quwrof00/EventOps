@@ -52,7 +52,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
     };
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-[#FFF4E8]">
             <div className="fixed top-[72px] right-6 z-20">
                 <Link
                     href={`/organizer/event/${id}`}

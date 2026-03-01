@@ -53,7 +53,7 @@ export default async function AttendeeDashboard() {
         : null;
 
     return (
-        <div className="min-h-screen bg-[#F0FDFA] font-sans text-steel-gray pt-16">
+        <div className="min-h-screen bg-[#E8F8F5] font-sans text-steel-gray pt-16">
 
             <main className="mx-auto max-w-7xl px-6 py-14">
 

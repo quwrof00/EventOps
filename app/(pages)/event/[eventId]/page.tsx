@@ -37,7 +37,7 @@ export default async function EventDetailPage({
     const priceDisplay = isFree ? 'Free' : `$${event.price}`;
 
     // Check if registered
-    const isRegistered = session?.user?.id ? event.participants.some(p => p.id === session.user.id) : false;
+    const isRegistered = session?.user?.id ? event.participants.some((p: any) => p.id === session.user.id) : false;
 
     // Date Formatting
     const eventDate = new Date(event.date);
@@ -55,7 +55,7 @@ export default async function EventDetailPage({
     const organizerName = event.organizers[0]?.name || 'EventOps Organizer';
 
     return (
-        <div className="min-h-screen bg-[#F0FDFA] font-sans text-steel-gray selection:bg-muted-teal selection:text-white pt-16">
+        <div className="min-h-screen bg-[#E8F8F5] font-sans text-steel-gray selection:bg-muted-teal selection:text-white pt-16">
 
             {/* PAGE HEADER */}
             <div className="bg-white/70 backdrop-blur-sm border-b border-[#ccf0ea]">
@@ -90,7 +90,7 @@ export default async function EventDetailPage({
                 <div className="grid grid-cols-1 gap-10 lg:grid-cols-3 items-start">
 
                     {/* MAIN CONTENT*/}
-                    <div className="lg:col-span-2">
+                    <div className="lg:col-span-2 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pr-2 pb-10 custom-scrollbar">
 
                         {/* Hero Image */}
                         <div className="mb-8 aspect-video w-full overflow-hidden border-2 border-gray-200 bg-soft-slate relative">
@@ -104,7 +104,7 @@ export default async function EventDetailPage({
                         </div>
 
                         {/* Sticky Tab Nav */}
-                        <div className="sticky top-16 z-10 -mx-6 mb-10 border-b-2 border-soft-slate bg-off-white/95 px-6 backdrop-blur-md">
+                        <div className="sticky top-0 z-20 -mx-6 mb-10 border-b-2 border-soft-slate bg-[#E8F8F5]/95 px-6 backdrop-blur-md">
                             <nav className="-mb-px flex gap-0 overflow-x-auto scrollbar-hide" aria-label="Tabs">
                                 <a href="#overview" className="border-b-4 border-muted-teal py-4 px-1 mr-8 text-xs font-bold uppercase tracking-widest text-muted-teal whitespace-nowrap">
                                     Overview
@@ -130,7 +130,7 @@ export default async function EventDetailPage({
 
                             {/* OVERVIEW */}
                             <section id="overview" className="scroll-mt-36">
-                                <div className="bg-white border-2 border-gray-200 relative overflow-hidden">
+                                <div className="bg-white border-2 border-gray-200 relative overflow-hidden transition hover:border-charcoal-blue hover:shadow-[4px_4px_0px_0px_rgba(31,42,55,1)]">
                                     <div className="absolute top-0 left-0 right-0 h-[3px] bg-muted-teal" />
                                     <div className="px-5 py-3.5 border-b-2 border-gray-100 bg-gray-50 mt-[3px]">
                                         <h3 className="text-xs font-bold uppercase tracking-widest text-charcoal-blue">About this Event</h3>
@@ -145,7 +145,7 @@ export default async function EventDetailPage({
 
                             {details.agenda.length > 0 && (
                                 <section id="agenda" className="scroll-mt-36">
-                                    <div className="bg-white border-2 border-gray-200 relative overflow-hidden">
+                                    <div className="bg-white border-2 border-gray-200 relative overflow-hidden transition hover:border-charcoal-blue hover:shadow-[4px_4px_0px_0px_rgba(31,42,55,1)]">
                                         <div className="absolute top-0 left-0 right-0 h-[3px] bg-muted-teal" />
                                         <div className="px-5 py-3.5 border-b-2 border-gray-100 bg-gray-50 mt-[3px]">
                                             <h3 className="text-xs font-bold uppercase tracking-widest text-charcoal-blue">Event Agenda</h3>
@@ -172,7 +172,7 @@ export default async function EventDetailPage({
 
                             {details.speakers.length > 0 && (
                                 <section id="speakers" className="scroll-mt-36">
-                                    <div className="bg-white border-2 border-gray-200 relative overflow-hidden">
+                                    <div className="bg-white border-2 border-gray-200 relative overflow-hidden transition hover:border-charcoal-blue hover:shadow-[4px_4px_0px_0px_rgba(31,42,55,1)]">
                                         <div className="absolute top-0 left-0 right-0 h-[3px] bg-muted-teal" />
                                         <div className="px-5 py-3.5 border-b-2 border-gray-100 bg-gray-50 mt-[3px]">
                                             <h3 className="text-xs font-bold uppercase tracking-widest text-charcoal-blue">Speakers</h3>
@@ -211,7 +211,7 @@ export default async function EventDetailPage({
                                     Venue & Location
                                 </h3>
 
-                                <div className="bg-white border-2 border-gray-200 relative overflow-hidden mb-6">
+                                <div className="bg-white border-2 border-gray-200 relative overflow-hidden mb-6 transition hover:border-charcoal-blue hover:shadow-[4px_4px_0px_0px_rgba(31,42,55,1)]">
                                     <div className="absolute top-0 left-0 right-0 h-[3px] bg-muted-teal" />
                                     <div className="px-5 py-3.5 border-b-2 border-gray-100 bg-gray-50 mt-[3px]">
                                         <h3 className="text-xs font-bold uppercase tracking-widest text-charcoal-blue">Venue &amp; Location</h3>
@@ -242,10 +242,10 @@ export default async function EventDetailPage({
                     </div>
 
                     {/* SIDEBAR  */}
-                    <div className="sticky top-28 space-y-6 self-start">
+                    <div className="lg:sticky lg:top-24 space-y-6 self-start lg:h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pr-2 pb-8 custom-scrollbar">
 
                         {/* REGISTRATION CARD */}
-                        <div className="border-2 border-gray-200 bg-white relative overflow-hidden transition hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,0.08)]">
+                        <div className="border-2 border-gray-200 bg-white relative overflow-hidden transition hover:border-charcoal-blue hover:shadow-[6px_6px_0px_0px_rgba(31,42,55,1)]">
                             {/* Teal top accent */}
                             <div className="absolute top-0 left-0 right-0 h-[3px] bg-muted-teal" />
 
@@ -322,7 +322,7 @@ export default async function EventDetailPage({
                         </div>
 
                         {/* POLICIES CARD */}
-                        <div className="bg-white border-2 border-gray-200 relative overflow-hidden">
+                        <div className="bg-white border-2 border-gray-200 relative overflow-hidden transition hover:border-charcoal-blue hover:shadow-[4px_4px_0px_0px_rgba(31,42,55,1)]">
                             <div className="absolute top-0 left-0 right-0 h-[3px] bg-muted-teal" />
                             <div className="px-5 py-3.5 border-b-2 border-gray-100 bg-gray-50 mt-[3px]">
                                 <h4 className="text-xs font-bold uppercase tracking-widest text-charcoal-blue">Event Policies</h4>
