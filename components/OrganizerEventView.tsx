@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
 import InviteOrganizerPanel from './InviteOrganizerPanel';
 import { addManualAttendee } from '@/app/actions/ticket';
+import { useToast } from './ToastProvider';
 
 interface Attendee {
   id: string;
@@ -43,6 +44,7 @@ export default function OrganizerEventView({
   attendees: initialAttendees,
   stats,
 }: OrganizerEventViewProps) {
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState("Overview");
 
   // Check-in state (client-side)
@@ -54,7 +56,7 @@ export default function OrganizerEventView({
 
   // Add attendee modal state
   const [showAddModal, setShowAddModal] = useState(false);
-  const [formData, setFormData] = useState({ name: "", email: "" });
+  const [formData, setFormData] = useState({ email: "" });
   const [formError, setFormError] = useState<string | null>(null);
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -88,15 +90,19 @@ export default function OrganizerEventView({
       const res = await addManualAttendee({
         eventId: event.id,
         email,
-        name: formData.name.trim() || undefined,
       });
 
       if (res.success) {
         setSubmitMessage(res.message || "Attendee added successfully!");
-        setFormData({ name: "", email: "" });
+        setFormData({ email: "" });
         setTimeout(() => setShowAddModal(false), 1800); // auto-close after success
       } else {
-        setFormError(res.message || "Failed to add attendee");
+        if (res.noAccount) {
+          showToast(res.message || "User does not have an account", "error");
+          setFormError("User does not have an account. Please ask them to register.");
+        } else {
+          setFormError(res.message || "Failed to add attendee");
+        }
       }
     } catch (err) {
       setFormError("An error occurred. Please try again.");
@@ -322,7 +328,7 @@ export default function OrganizerEventView({
                 {/* ADD ATTENDEE BUTTON – opens beautiful modal */}
                 <button
                   onClick={() => {
-                    setFormData({ name: '', email: '' });
+                    setFormData({ email: '' });
                     setFormError(null);
                     setSubmitMessage(null);
                     setShowAddModal(true);
@@ -517,20 +523,6 @@ export default function OrganizerEventView({
 
             {/* Form */}
             <form onSubmit={handleAddAttendee} className="p-6 space-y-5">
-              {/* Name */}
-              <div>
-                <label className="block text-[13px] font-semibold text-charcoal-blue mb-1.5">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="John Doe"
-                  className="w-full px-4 py-2.5 border-2 border-soft-slate rounded-lg focus:border-signal-orange focus:outline-none transition text-[14px]"
-                />
-              </div>
-
               {/* Email */}
               <div>
                 <label className="block text-[13px] font-semibold text-charcoal-blue mb-1.5">

@@ -4,16 +4,14 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { getAuthOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
-import crypto from 'crypto'; 
+import crypto from 'crypto';
 
 export async function addManualAttendee({
   eventId,
   email,
-  name,
 }: {
   eventId: string;
   email: string;
-  name?: string;
 }) {
   const session = await getServerSession(getAuthOptions());
 
@@ -46,22 +44,12 @@ export async function addManualAttendee({
       return { success: false, message: "Event capacity reached" };
     }
 
-    //Find or create user (with dummy password)
     let user = await prisma.user.findUnique({
       where: { email },
     });
 
     if (!user) {
-      const dummyPassword = 'manual_' + crypto.randomUUID().slice(0, 12); // random but valid string
-
-      user = await prisma.user.create({
-        data: {
-          email,
-          name: name || "Manual Attendee",
-          password: dummyPassword, 
-          // password: "MANUAL_NO_LOGIN_2025",
-        },
-      });
+      return { success: false, noAccount: true, message: "User does not have an account" };
     }
 
     //Prevent duplicate ticket
@@ -101,11 +89,11 @@ export async function addManualAttendee({
     return { success: true, message: "Attendee added successfully" };
   } catch (err: any) {
     console.error("addManualAttendee error:", err);
-    return { 
-      success: false, 
-      message: err.message?.includes("Unique") 
-        ? "Email might already exist or duplicate entry" 
-        : "Failed to add attendee – check server logs" 
+    return {
+      success: false,
+      message: err.message?.includes("Unique")
+        ? "Email might already exist or duplicate entry"
+        : "Failed to add attendee – check server logs"
     };
   }
 }

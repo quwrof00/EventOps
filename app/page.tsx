@@ -18,90 +18,90 @@ export default async function LandingPage() {
       <CursorHighlight />
 
       {/* ── HERO ─────────────────────────────────────────────────────── */}
-      <section className="min-h-screen relative overflow-hidden flex items-center">
-        {/* Blobs */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute -left-40 top-0 h-125 w-125 rounded-full bg-teal-500/10 blur-3xl" />
-          <div className="absolute -right-40 top-40 h-150 w-150 rounded-full bg-blue-900/10 blur-3xl" />
-        </div>
+      <section className="relative flex flex-col lg:block overflow-hidden border-b-2 border-charcoal-blue bg-attendee-surface">
 
-        <div className="relative mx-auto max-w-7xl px-6 py-32 w-full">
-          <div className="grid items-center gap-12 lg:grid-cols-3">
+        {/* Attendee Side (Primary Focus - 2/3 Width) */}
+        <div className="w-full min-h-[60vh] lg:min-h-[90vh] bg-attendee-surface text-charcoal-blue flex flex-col justify-center px-8 py-20 lg:py-32 lg:pl-20 lg:pr-[45%] relative group cursor-default">
+          {/* Subtle pattern for texture */}
+          <div className="absolute inset-0 opacity-[0.03] transition-transform duration-1000 group-hover:scale-105" style={{ backgroundImage: `radial-gradient(circle, #0F766E 2px, transparent 2px)`, backgroundSize: '32px 32px' }} />
 
-            {/* LEFT — Content */}
-            <div className="lg:col-span-2">
-              <h1 className="mb-6 bg-linear-to-r from-gray-900 via-blue-900 to-teal-700 bg-clip-text text-3xl font-bold leading-tight text-transparent md:text-5xl">
-                Discover &amp; Manage<br />Events Effortlessly
-              </h1>
-
-              <p className="mb-10 max-w-2xl text-xl leading-relaxed text-gray-600">
-                From local meetups to large conferences — browse, book tickets, or
-                create your own event with real-time analytics, QR check-in, and
-                seamless ticketing.
-              </p>
-
-              <div className="flex flex-wrap items-center gap-4">
-                <Link
-                  href="/events"
-                  className="relative overflow-hidden border-2 border-gray-900 bg-transparent px-8 py-4 font-sans text-lg font-bold tracking-wider text-gray-900 transition-all hover:bg-gray-900 hover:text-white"
-                >
-                  <span className="relative z-10">Browse Events</span>
-                </Link>
-                <Link
-                  href="/organizer/create-event"
-                  className="relative overflow-hidden border-2 border-signal-orange bg-signal-orange px-8 py-4 font-sans text-lg font-bold tracking-wider text-white transition-all hover:bg-transparent hover:text-signal-orange"
-                >
-                  <span className="relative z-10">Create Event</span>
-                </Link>
-              </div>
-
-              {/* Stats */}
-              <div className="mt-14 grid max-w-xl grid-cols-3 gap-8">
-                <div>
-                  <div className="text-3xl font-bold text-gray-900">50K+</div>
-                  <div className="text-sm text-gray-600">Events</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-gray-900">2M+</div>
-                  <div className="text-sm text-gray-600">Tickets</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-gray-900">98%</div>
-                  <div className="text-sm text-gray-600">Satisfaction</div>
-                </div>
-              </div>
+          <div className="relative z-10 w-full max-w-2xl mx-auto lg:mr-auto lg:ml-0 flex flex-col items-start lg:pl-4">
+            <div className="inline-flex items-center gap-2 border-2 border-muted-teal/20 bg-muted-teal/5 px-4 py-1.5 text-xs font-bold tracking-widest uppercase mb-8 backdrop-blur-sm text-muted-teal">
+              <span className="w-2 h-2 rounded-full bg-muted-teal animate-pulse" />
+              For Attendees
             </div>
 
-            {/* RIGHT — Visual */}
-            <div className="relative hidden lg:block">
-              <span className="mb-4 inline-block border-2 border-gray-900 px-4 py-1 text-sm font-bold tracking-wider text-gray-900 bg-white">
-                EventOps
-              </span>
+            <h1 className="text-6xl lg:text-[5.5rem] font-black tracking-tighter leading-[1.05] mb-6 drop-shadow-sm">
+              Find Your<br />
+              <span className="text-muted-teal">Next Vibe.</span>
+            </h1>
 
-              <div className="relative border-2 border-gray-900 bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                <div className="flex items-center gap-2 border-b-2 border-gray-100 p-4 bg-gray-50">
-                  <div className="h-3 w-3 border border-gray-900 bg-gray-900" />
-                  <div className="h-3 w-3 border border-gray-900 bg-transparent" />
-                  <div className="h-3 w-3 border border-gray-900 bg-transparent" />
-                </div>
-                <div className="space-y-4 p-6">
-                  <div className="h-4 w-3/4 border border-gray-200 bg-gray-100" />
-                  <div className="h-24 border-2 border-teal-500/20 bg-teal-50" />
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="h-20 border border-gray-200 bg-gray-50" />
-                    <div className="h-20 border border-gray-200 bg-gray-50" />
+            <p className="text-xl text-steel-gray font-medium mb-12 leading-relaxed max-w-lg">
+              Discover local meetups, epic conferences, and exclusive shows. Secure your spot in seconds and let the experience begin.
+            </p>
+
+            <Link
+              href="/events"
+              className="inline-flex items-center gap-4 border-2 border-charcoal-blue bg-muted-teal text-white px-10 py-5 text-base font-bold tracking-widest uppercase hover:bg-charcoal-blue hover:text-white transition-all shadow-[8px_8px_0px_0px_rgba(31,42,55,1)] hover:shadow-none hover:translate-x-[8px] hover:translate-y-[8px] group/btn"
+            >
+              Browse Events
+              <svg className="h-5 w-5 transition-transform group-hover/btn:translate-x-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+
+            <div className="mt-16 flex items-center gap-6">
+              <div className="flex -space-x-3">
+                {[1, 2, 3, 4].map(i => (
+                  <div key={i} className={`w-10 h-10 rounded-full border-2 border-muted-teal bg-white backdrop-blur-sm shadow-sm flex items-center justify-center`}>
+                    <svg className="h-5 w-5 text-muted-teal/70" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" /></svg>
                   </div>
+                ))}
+                <div className="w-10 h-10 rounded-full border-2 border-muted-teal bg-muted-teal flex items-center justify-center text-xs font-bold text-white shadow-sm">
+                  +
                 </div>
               </div>
-
-              <div className="absolute -bottom-10 -left-10 border-2 border-gray-900 bg-gray-900 px-6 py-4 text-white shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)]">
-                <div className="text-xs font-bold tracking-wider opacity-80">Live Attendees</div>
-                <div className="text-2xl font-bold font-sans">1,248</div>
+              <div>
+                <p className="text-2xl font-black text-charcoal-blue leading-none">2M+</p>
+                <p className="text-xs font-bold text-steel-gray uppercase tracking-widest mt-1">Tickets Sold</p>
               </div>
             </div>
-
           </div>
         </div>
+
+        {/* Organizer Side (Secondary Focus - 1/3 Width) */}
+        <div className="w-full lg:absolute lg:top-0 lg:right-0 lg:w-[45%] lg:h-full bg-organizer-surface text-charcoal-blue flex flex-col justify-center px-8 py-20 lg:px-12 relative group overflow-hidden cursor-default lg:[clip-path:polygon(15%_0,100%_0,100%_100%,0%_100%)] border-t-2 lg:border-t-0 border-charcoal-blue">
+          {/* Intense pattern for contrast */}
+          <div className="absolute inset-0 opacity-[0.03] transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `repeating-linear-gradient(45deg, #C2410C 0, #C2410C 3px, transparent 0, transparent 50%)`, backgroundSize: '40px 40px' }} />
+
+          <div className="relative z-10 w-full max-w-sm mx-auto flex flex-col items-start lg:items-center lg:text-center text-left lg:pl-10">
+            <div className="inline-flex items-center gap-2 border-2 border-signal-orange/20 bg-signal-orange/5 px-4 py-1.5 text-xs font-bold tracking-widest uppercase mb-10 backdrop-blur-sm text-signal-orange">
+              <svg className="h-3 w-3 text-signal-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              For Organizers
+            </div>
+
+            <h2 className="text-4xl lg:text-[2.75rem] font-black tracking-tight leading-[1.05] mb-6 drop-shadow-sm">
+              Hosting<br className="hidden lg:block" />an Event?
+            </h2>
+
+            <p className="text-lg text-steel-gray font-medium mb-10 leading-relaxed max-w-xs mx-auto">
+              Launch events instantly. Track live sales, manage check-ins, and scale effortlessly.
+            </p>
+
+            <Link
+              href="/organizer/create-event"
+              className="inline-flex items-center gap-3 border-2 border-charcoal-blue bg-signal-orange text-white px-6 py-4 text-xs font-bold tracking-widest uppercase hover:bg-charcoal-blue hover:text-white transition-all shadow-[6px_6px_0px_0px_rgba(31,42,55,1)] hover:shadow-none hover:translate-x-[6px] hover:translate-y-[6px]"
+            >
+              Start Creating
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+
       </section>
 
       {/* ── FEATURES ─────────────────────────────────────────────────── */}

@@ -3,9 +3,9 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   req: Request,
-  { params }: { params: { ticketId: string } }
+  { params }: { params: Promise<{ ticketId: string }> }
 ) {
-  const ticketId = params.ticketId;
+  const { ticketId } = await params;
 
   try {
     const ticket = await prisma.ticket.findUnique({
