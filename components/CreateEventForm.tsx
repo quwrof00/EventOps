@@ -91,6 +91,7 @@ export default function CreateEventForm({ initialData, isEditMode = false, event
 
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
     const [imageUploading, setImageUploading] = useState(false);
     const [imageUploadError, setImageUploadError] = useState('');
 
@@ -121,6 +122,8 @@ export default function CreateEventForm({ initialData, isEditMode = false, event
         }
 
         setIsSubmitting(true);
+        // Optimistically set to success to immediately update button UI
+        setIsSuccess(true);
 
         try {
             // Pack details into description field
@@ -163,6 +166,7 @@ export default function CreateEventForm({ initialData, isEditMode = false, event
             router.refresh();
 
         } catch (error) {
+            setIsSuccess(false);
             console.error("Submission error:", error);
             alert(error instanceof Error ? error.message : "Failed to create event");
         } finally {
@@ -828,7 +832,7 @@ export default function CreateEventForm({ initialData, isEditMode = false, event
                                     onClick={handleSubmit}
                                     className="bg-signal-orange hover:bg-signal-orange/90 text-white px-8 py-3 font-bold  tracking-wider transition-all border-2 border-signal-orange hover:shadow-[4px_4px_0px_0px_rgba(194,65,12,0.5)]"
                                 >
-                                    {isSubmitting ? 'Creating...' : (isEditMode ? 'Save Changes' : 'Publish Event')}
+                                    {isSuccess ? (isEditMode ? 'Saved! Redirecting...' : 'Published! Redirecting...') : (isSubmitting ? 'Creating...' : (isEditMode ? 'Save Changes' : 'Publish Event'))}
                                 </button>
                             )}
                         </div>

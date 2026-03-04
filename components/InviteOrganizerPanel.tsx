@@ -17,29 +17,33 @@ export default function InviteOrganizerPanel({ eventId }: InviteOrganizerPanelPr
         e.preventDefault();
         if (!email.trim()) return;
 
-        setStatus('loading');
-        setMessage('');
+        const currentEmail = email.trim().toLowerCase();
+
+        // Optimistic UI update
+        setStatus('success');
+        setMessage(`Invitation sent to ${currentEmail}`);
+        setEmail('');
 
         try {
             const res = await fetch('/api/organizer/invite', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ eventId, email: email.trim().toLowerCase() }),
+                body: JSON.stringify({ eventId, email: currentEmail }),
             });
 
             const data = await res.json();
 
             if (res.ok) {
-                setStatus('success');
-                setMessage(data.message || `Invitation sent to ${email}`);
-                setEmail('');
+                setMessage(data.message || `Invitation sent to ${currentEmail}`);
             } else {
                 setStatus('error');
                 setMessage(data.error || 'Failed to send invitation');
+                setEmail(currentEmail);
             }
         } catch {
             setStatus('error');
             setMessage('A network error occurred. Please try again.');
+            setEmail(currentEmail);
         }
     };
 

@@ -20,6 +20,7 @@ export default function ProfileClient({ user }: { user: UserData }) {
     const router = useRouter();
     const [name, setName] = useState(user.name);
     const [isSaving, setIsSaving] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -29,6 +30,7 @@ export default function ProfileClient({ user }: { user: UserData }) {
         }
 
         setIsSaving(true);
+        setIsSuccess(true);
         try {
             const res = await fetch("/api/profile", {
                 method: "PUT",
@@ -39,11 +41,14 @@ export default function ProfileClient({ user }: { user: UserData }) {
             if (res.ok) {
                 showToast("Profile updated successfully", "success");
                 router.refresh(); // refresh server component
+                setTimeout(() => setIsSuccess(false), 2000);
             } else {
+                setIsSuccess(false);
                 const data = await res.json();
                 showToast(data.error || "Failed to update profile", "error");
             }
         } catch (error) {
+            setIsSuccess(false);
             showToast("An unexpected error occurred", "error");
         } finally {
             setIsSaving(false);
@@ -169,8 +174,8 @@ export default function ProfileClient({ user }: { user: UserData }) {
                                         disabled={isSaving || name === user.name}
                                         className="group relative inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-signal-orange text-[13px] font-black uppercase tracking-widest text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed hover:bg-charcoal-blue shadow-[4px_4px_0px_0px_rgba(31,42,55,1)] disabled:shadow-none"
                                     >
-                                        {isSaving ? "Saving..." : "Save Changes"}
-                                        {!isSaving && (
+                                        {isSuccess ? "Saved!" : (isSaving ? "Saving..." : "Save Changes")}
+                                        {!isSaving && !isSuccess && (
                                             <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                             </svg>

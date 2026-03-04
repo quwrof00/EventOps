@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { QRCodeSVG } from 'qrcode.react';
+import { useOptimistic, startTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import InviteOrganizerPanel from './InviteOrganizerPanel';
 import { addManualAttendee } from '@/app/actions/ticket';
 import { useToast } from './ToastProvider';
@@ -60,6 +62,13 @@ export default function OrganizerEventView({
   const [formError, setFormError] = useState<string | null>(null);
   const [submitMessage, setSubmitMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
+
+  const [optimisticAttendees, addOptimisticAttendee] = useOptimistic(
+    initialAttendees,
+    (state: Attendee[], newAttendee: Attendee) => [newAttendee, ...state]
+  );
 
   const TABS = ["Overview", "Attendees", "Marketing", "Settings"];
 
@@ -86,6 +95,18 @@ export default function OrganizerEventView({
 
     setIsSubmitting(true);
 
+    startTransition(() => {
+      addOptimisticAttendee({
+        id: `temp-${Date.now()}`,
+        name: "Processing...",
+        email,
+        ticket: "Manual Entry",
+        status: "Confirmed",
+        purchaseDate: new Date().toLocaleDateString(),
+        checkedIn: false
+      });
+    });
+
     try {
       const res = await addManualAttendee({
         eventId: event.id,
@@ -95,6 +116,7 @@ export default function OrganizerEventView({
       if (res.success) {
         setSubmitMessage(res.message || "Attendee added successfully!");
         setFormData({ email: "" });
+        router.refresh();
         setTimeout(() => setShowAddModal(false), 1800); // auto-close after success
       } else {
         if (res.noAccount) {
@@ -343,18 +365,18 @@ export default function OrganizerEventView({
             {/* Summary bar */}
             <div className="flex items-center gap-6 px-6 py-3 bg-gray-50/60 border-b border-soft-slate/60">
               <span className="text-[11px] font-bold text-steel-gray">
-                {initialAttendees.length} attendees
+                {optimisticAttendees.length} attendees
               </span>
               <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 bg-muted-teal" />
                 <span className="text-[11px] text-steel-gray">
-                  {initialAttendees.filter(a => a.status === 'Confirmed').length} confirmed
+                  {optimisticAttendees.filter(a => a.status === 'Confirmed').length} confirmed
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 bg-gray-300" />
                 <span className="text-[11px] text-steel-gray">
-                  {initialAttendees.filter(a => a.status !== 'Confirmed').length} other
+                  {optimisticAttendees.filter(a => a.status !== 'Confirmed').length} other
                 </span>
               </div>
             </div>
@@ -370,7 +392,7 @@ export default function OrganizerEventView({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {initialAttendees.length > 0 ? initialAttendees.map((attendee) => {
+                  {optimisticAttendees.length > 0 ? optimisticAttendees.map((attendee) => {
                     const isCheckedIn = checkInMap[attendee.id] ?? attendee.checkedIn;
 
                     return (
@@ -433,10 +455,10 @@ export default function OrganizerEventView({
             </div>
 
             {/* Pagination */}
-            {initialAttendees.length > 5 && (
+            {optimisticAttendees.length > 5 && (
               <div className="flex items-center justify-between px-6 py-4 border-t-2 border-soft-slate bg-gray-50/40">
                 <span className="text-[11px] font-bold tracking-wider text-steel-gray">
-                  Showing {initialAttendees.length} attendees
+                  Showing {optimisticAttendees.length} attendees
                 </span>
                 <div className="flex gap-1">
                   <button className="w-8 h-8 flex items-center justify-center border-2 border-soft-slate text-[12px] font-bold text-steel-gray hover:border-charcoal-blue hover:text-charcoal-blue transition">‹</button>
@@ -485,22 +507,26 @@ export default function OrganizerEventView({
                 <button
                   onClick={async () => {
                     if (confirm("Are you sure you want to delete this event? This action cannot be undone.")) {
+                      setIsDeleting(true);
                       try {
                         const res = await fetch(`/api/events/${event.id}`, { method: 'DELETE' });
                         if (res.ok) {
                           window.location.href = "/organizer/dashboard";
                         } else {
+                          setIsDeleting(false);
                           alert("Failed to delete event");
                         }
                       } catch (e) {
                         console.error(e);
+                        setIsDeleting(false);
                         alert("An error occurred");
                       }
                     }
                   }}
-                  className="inline-flex items-center gap-2 border-2 border-red-500 bg-red-500 px-5 py-2.5 text-[12px] font-bold tracking-widest text-white hover:bg-white hover:text-red-500 transition"
+                  disabled={isDeleting}
+                  className="inline-flex items-center gap-2 border-2 border-red-500 bg-red-500 px-5 py-2.5 text-[12px] font-bold tracking-widest text-white hover:bg-white hover:text-red-500 transition disabled:opacity-50"
                 >
-                  Delete Event
+                  {isDeleting ? "Deleted! Redirecting..." : "Delete Event"}
                 </button>
               </div>
             </div>
