@@ -26,10 +26,6 @@ export default async function LandingPage() {
           <div className="absolute inset-0 opacity-[0.03] transition-transform duration-1000 group-hover:scale-105" style={{ backgroundImage: `radial-gradient(circle, #0F766E 2px, transparent 2px)`, backgroundSize: '32px 32px' }} />
 
           <div className="relative z-10 w-full max-w-2xl mx-auto lg:mr-auto lg:ml-0 flex flex-col items-start lg:pl-4">
-            <div className="inline-flex items-center gap-2 border-2 border-muted-teal/20 bg-muted-teal/5 px-4 py-1.5 text-xs font-bold tracking-widest uppercase mb-8 backdrop-blur-sm text-muted-teal">
-              <span className="w-2 h-2 rounded-full bg-muted-teal animate-pulse" />
-              For Attendees
-            </div>
 
             <h1 className="text-6xl lg:text-[5.5rem] font-black tracking-tighter leading-[1.05] mb-6 drop-shadow-sm">
               Find Your<br />
@@ -75,12 +71,6 @@ export default async function LandingPage() {
           <div className="absolute inset-0 opacity-[0.03] transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `repeating-linear-gradient(45deg, #C2410C 0, #C2410C 3px, transparent 0, transparent 50%)`, backgroundSize: '40px 40px' }} />
 
           <div className="relative z-10 w-full max-w-sm mx-auto flex flex-col items-start lg:items-center lg:text-center text-left lg:pl-10">
-            <div className="inline-flex items-center gap-2 border-2 border-signal-orange/20 bg-signal-orange/5 px-4 py-1.5 text-xs font-bold tracking-widest uppercase mb-10 backdrop-blur-sm text-signal-orange">
-              <svg className="h-3 w-3 text-signal-orange" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              For Organizers
-            </div>
 
             <h2 className="text-4xl lg:text-[2.75rem] font-black tracking-tight leading-[1.05] mb-6 drop-shadow-sm">
               Hosting<br className="hidden lg:block" />an Event?
