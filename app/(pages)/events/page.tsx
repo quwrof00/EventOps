@@ -12,21 +12,34 @@ export default async function EventsListPage() {
         orderBy: { createdAt: 'desc' }
     });
 
-    const allEvents = allEventsRaw.map(event => ({
-        id: event.id,
-        title: event.title,
-        description: event.description || '',
-        category: event.category,
-        tags: event.tags ?? [],
-        date: event.date,
-        image: event.image || '/placeholder-1.jpg',
-        price: event.price,
-        isFree: event.isFree,
-        capacity: event.capacity,
-        displayLocation: event.location ? event.location.split('|')[0] : 'TBD',
-        spotsLeft: event.capacity - event.participants.length,
-        attendeesCount: event.participants.length,
-    }));
+    const allEvents = allEventsRaw.map(event => {
+        let isRemote = false;
+        if (event.description) {
+            try {
+                const parsed = JSON.parse(event.description);
+                if (parsed && typeof parsed === 'object' && parsed.formatMeta) {
+                    isRemote = !!parsed.formatMeta.isRemote;
+                }
+            } catch { }
+        }
+
+        return {
+            id: event.id,
+            title: event.title,
+            description: event.description || '',
+            category: event.category,
+            tags: event.tags ?? [],
+            date: event.date,
+            image: event.image || '/placeholder-1.jpg',
+            price: event.price,
+            isFree: event.isFree,
+            capacity: event.capacity,
+            displayLocation: event.location ? event.location.split('|')[0] : 'TBD',
+            spotsLeft: event.capacity - event.participants.length,
+            attendeesCount: event.participants.length,
+            isRemote,
+        };
+    });
 
     // Calculate Trending (Top 5 by participants)
     const trendingEvents = [...allEvents]

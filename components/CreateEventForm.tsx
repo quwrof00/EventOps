@@ -45,6 +45,9 @@ interface EventFormData {
     date: string;
     time: string;
     location: string;
+    venueName?: string;
+    city?: string;
+    country?: string;
     coordinates?: string;
     description: string;
     image: string;
@@ -74,6 +77,9 @@ export default function CreateEventForm({ initialData, isEditMode = false, event
         date: '',
         time: '',
         location: '',
+        venueName: '',
+        city: '',
+        country: '',
         description: '',
         image: '/placeholder-1.jpg',
         capacity: 100,
@@ -85,13 +91,32 @@ export default function CreateEventForm({ initialData, isEditMode = false, event
         formatMeta: {},
     };
 
-    const [formData, setFormData] = useState<EventFormData>({
-        ...defaultFormData,
-        ...initialData,
-        agenda: initialData?.agenda ?? [],
-        speakers: initialData?.speakers ?? [],
-        tags: initialData?.tags ?? [],
-        formatMeta: initialData?.formatMeta ?? {},
+    const [formData, setFormData] = useState<EventFormData>(() => {
+        const initialLocationStr = initialData?.location || '';
+        const isRemoteInit = initialData?.formatMeta?.isRemote || false;
+        let initVenue = '', initCity = '', initCountry = '';
+        if (!isRemoteInit && initialLocationStr && initialLocationStr !== 'Online') {
+            const parts = initialLocationStr.split(', ').map(s => s.trim());
+            if (parts.length >= 3) {
+                initVenue = parts.slice(0, parts.length - 2).join(', ');
+                initCity = parts[parts.length - 2];
+                initCountry = parts[parts.length - 1];
+            } else {
+                initVenue = initialLocationStr;
+            }
+        }
+
+        return {
+            ...defaultFormData,
+            ...initialData,
+            venueName: initVenue,
+            city: initCity,
+            country: initCountry,
+            agenda: initialData?.agenda ?? [],
+            speakers: initialData?.speakers ?? [],
+            tags: initialData?.tags ?? [],
+            formatMeta: initialData?.formatMeta ?? {},
+        };
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -159,14 +184,19 @@ export default function CreateEventForm({ initialData, isEditMode = false, event
                 formatMeta: formData.formatMeta,
             });
 
+            const finalLocation = formData.formatMeta.isRemote
+                ? formData.location
+                : [formData.venueName, formData.city, formData.country].filter(Boolean).join(', ');
+
+            const { venueName, city, country, ...restFormData } = formData;
             // Prepare payload - if coordinates exist, append them to location string using a delimiter
             // This is a workaround since we don't have a migration for coordinates column yet
             const payload = {
-                ...formData,
+                ...restFormData,
                 description: descriptionPacked, // Packed JSON
                 location: formData.coordinates
-                    ? `${formData.location}|${formData.coordinates}`
-                    : formData.location
+                    ? `${finalLocation}|${formData.coordinates}`
+                    : finalLocation
             };
 
             const url = isEditMode && eventId ? `/api/events/${eventId}` : '/api/events/create';
@@ -419,27 +449,63 @@ export default function CreateEventForm({ initialData, isEditMode = false, event
                                                 />
                                             </div>
                                         </div>
+                                        <div className="flex items-center justify-between py-3 border-b-2 border-soft-slate mb-4">
+                                            <div>
+                                                <span className="block text-sm font-bold text-charcoal-blue">Online / Remote Event</span>
+                                                <span className="text-xs text-steel-gray">This event is held virtually</span>
+                                            </div>
+                                            <div onClick={() => {
+                                                handleMetaChange('isRemote', !formData.formatMeta.isRemote);
+                                                if (!formData.formatMeta.isRemote) {
+                                                    setFormData(prev => ({ ...prev, location: 'Online', coordinates: '' }));
+                                                } else {
+                                                    setFormData(prev => ({ ...prev, location: '' }));
+                                                }
+                                            }} className={`w-14 h-8 flex items-center p-1 cursor-pointer transition-colors border-2 ${formData.formatMeta.isRemote ? 'bg-signal-orange border-signal-orange' : 'bg-transparent border-soft-slate'}`}>
+                                                <div className={`w-5 h-5 shadow-sm transform transition-transform ${formData.formatMeta.isRemote ? 'translate-x-6 bg-white' : 'translate-x-0 bg-charcoal-blue'}`} />
+                                            </div>
+                                        </div>
+
                                         <div className="space-y-2">
-                                            <label className="block text-sm font-bold text-charcoal-blue  tracking-wider">Location / Venue Name</label>
+                                            <label className="block text-sm font-bold text-charcoal-blue  tracking-wider">{formData.formatMeta.isRemote ? 'Platform / Link (Optional)' : 'Venue Name'}</label>
                                             <div className="relative flex gap-2">
                                                 <div className="relative flex-1">
                                                     <input
                                                         type="text"
-                                                        name="location"
-                                                        value={formData.location}
+                                                        name={formData.formatMeta.isRemote ? "location" : "venueName"}
+                                                        value={formData.formatMeta.isRemote ? formData.location : formData.venueName}
                                                         onChange={handleChange}
-                                                        placeholder="Venue name or address"
+                                                        placeholder={formData.formatMeta.isRemote ? "e.g. Zoom, Discord, Google Meet" : "Venue name or address"}
                                                         className="w-full pl-11 pr-4 py-3 border-2 border-soft-slate focus:border-charcoal-blue focus:ring-0 outline-none transition-all placeholder:text-steel-gray/50 bg-white text-charcoal-blue"
-                                                        required
+                                                        required={!formData.formatMeta.isRemote}
                                                     />
-                                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-signal-orange text-lg">📍</span>
+                                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-signal-orange text-lg">{formData.formatMeta.isRemote ? '🌐' : '📍'}</span>
                                                 </div>
+                                            </div>
+                                        </div>
+
+                                        {!formData.formatMeta.isRemote && (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                                <div className="space-y-2">
+                                                    <label className="block text-sm font-bold text-charcoal-blue tracking-wider">City</label>
+                                                    <input type="text" name="city" value={formData.city || ''} onChange={handleChange} placeholder="e.g. San Francisco" className="w-full px-4 py-3 border-2 border-soft-slate focus:border-charcoal-blue focus:ring-0 outline-none transition-all bg-white text-charcoal-blue" required />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="block text-sm font-bold text-charcoal-blue tracking-wider">Country</label>
+                                                    <input type="text" name="country" value={formData.country || ''} onChange={handleChange} placeholder="e.g. United States" className="w-full px-4 py-3 border-2 border-soft-slate focus:border-charcoal-blue focus:ring-0 outline-none transition-all bg-white text-charcoal-blue" required />
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {!formData.formatMeta.isRemote && (
+                                            <div className="flex justify-end mt-2">
                                                 <button
                                                     type="button"
                                                     onClick={async () => {
-                                                        if (!formData.location) return;
+                                                        const query = [formData.venueName, formData.city, formData.country].filter(Boolean).join(', ');
+                                                        if (!query) return;
                                                         try {
-                                                            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(formData.location)}`);
+                                                            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
                                                             const data = await res.json();
                                                             if (data && data[0]) {
                                                                 const coords = `${data[0].lat},${data[0].lon}`;
@@ -452,26 +518,28 @@ export default function CreateEventForm({ initialData, isEditMode = false, event
                                                             alert('Failed to fetch coordinates');
                                                         }
                                                     }}
-                                                    className="px-4 py-3 bg-charcoal-blue text-white font-bold  tracking-wider text-sm border-2 border-charcoal-blue hover:bg-white hover:text-charcoal-blue transition-colors"
+                                                    className="px-6 py-3 bg-charcoal-blue text-white font-bold tracking-wider text-sm border-2 border-charcoal-blue hover:bg-white hover:text-charcoal-blue transition-colors"
                                                 >
-                                                    Find
+                                                    Find Coordinates on Map
                                                 </button>
                                             </div>
-                                        </div>
+                                        )}
 
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between items-center">
-                                                <label className="block text-sm font-bold text-charcoal-blue  tracking-wider">Pin on Map</label>
-                                                <span className="text-xs text-steel-gray">Optional</span>
+                                        {!formData.formatMeta.isRemote && (
+                                            <div className="space-y-2">
+                                                <div className="flex justify-between items-center">
+                                                    <label className="block text-sm font-bold text-charcoal-blue  tracking-wider">Pin on Map</label>
+                                                    <span className="text-xs text-steel-gray">Optional</span>
+                                                </div>
+                                                <div className="overflow-hidden border-2 border-soft-slate">
+                                                    <LocationPicker
+                                                        value={formData.coordinates || ''}
+                                                        onChange={(coords) => setFormData(prev => ({ ...prev, coordinates: coords }))}
+                                                    />
+                                                </div>
+                                                <p className="text-xs text-steel-gray">Click on the map to set precise location.</p>
                                             </div>
-                                            <div className="overflow-hidden border-2 border-soft-slate">
-                                                <LocationPicker
-                                                    value={formData.coordinates || ''}
-                                                    onChange={(coords) => setFormData(prev => ({ ...prev, coordinates: coords }))}
-                                                />
-                                            </div>
-                                            <p className="text-xs text-steel-gray">Click on the map to set precise location.</p>
-                                        </div>
+                                        )}
                                     </div>
                                 )}
 
@@ -616,6 +684,15 @@ export default function CreateEventForm({ initialData, isEditMode = false, event
                                                     <div className="space-y-2">
                                                         <label className="block text-sm font-bold text-charcoal-blue tracking-wider">Max Team Size</label>
                                                         <input type="number" min={1} value={formData.formatMeta.teamSizeMax || ''} onChange={e => handleMetaChange('teamSizeMax', e.target.value)} placeholder="5" className="w-full px-4 py-3 border-2 border-soft-slate focus:border-charcoal-blue focus:ring-0 outline-none bg-white text-charcoal-blue" />
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center justify-between py-2 border-t border-b border-soft-slate my-2">
+                                                    <div>
+                                                        <span className="block text-sm font-bold text-charcoal-blue">Allow Solo Participants</span>
+                                                        <span className="text-xs text-steel-gray">Users can register without a team</span>
+                                                    </div>
+                                                    <div onClick={() => handleMetaChange('allowSolo', !formData.formatMeta.allowSolo)} className={`w-14 h-8 flex items-center p-1 cursor-pointer transition-colors border-2 ${formData.formatMeta.allowSolo ? 'bg-signal-orange border-signal-orange' : 'bg-transparent border-soft-slate'}`}>
+                                                        <div className={`w-5 h-5 shadow-sm transform transition-transform ${formData.formatMeta.allowSolo ? 'translate-x-6 bg-white' : 'translate-x-0 bg-charcoal-blue'}`} />
                                                     </div>
                                                 </div>
                                                 <div className="space-y-2">

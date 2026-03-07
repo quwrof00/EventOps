@@ -6,7 +6,7 @@ import { CATEGORIES, POPULAR_TAGS } from '@/lib/data';
 
 interface EventData {
     id: string; title: string; description: string; category: string; tags: string[]; date: string | Date; image: string;
-    price: string | null; isFree: boolean; capacity: number; displayLocation: string; spotsLeft: number; attendeesCount: number;
+    price: string | null; isFree: boolean; capacity: number; displayLocation: string; spotsLeft: number; attendeesCount: number; isRemote: boolean;
 }
 interface TrendingEvent { id: string; title: string; attendees: number; }
 interface EventsBrowserProps { initialEvents: EventData[]; trendingEvents: TrendingEvent[]; }
@@ -16,6 +16,7 @@ export default function EventsBrowser({ initialEvents, trendingEvents }: EventsB
     const [category, setCategory] = useState('All Events');
     const [activeTag, setActiveTag] = useState('');
     const [dateFilter, setDateFilter] = useState('Any Date');
+    const [venueType, setVenueType] = useState('Any Venue');
     const [sort, setSort] = useState('Newest');
     const [visibleCount, setVisibleCount] = useState(5);
     const observerRef = useRef<IntersectionObserver | null>(null);
@@ -42,6 +43,10 @@ export default function EventsBrowser({ initialEvents, trendingEvents }: EventsB
                     if (eventDate.getMonth() !== ((today.getMonth() + 1) % 12)) return false;
                 }
             }
+            if (venueType !== 'Any Venue') {
+                if (venueType === 'Remote / Online' && !event.isRemote) return false;
+                if (venueType === 'Physical Location' && event.isRemote) return false;
+            }
             return true;
         });
         if (sort === 'Most Popular') {
@@ -50,7 +55,7 @@ export default function EventsBrowser({ initialEvents, trendingEvents }: EventsB
             result.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
         }
         return result;
-    }, [initialEvents, search, category, activeTag, dateFilter, sort]);
+    }, [initialEvents, search, category, activeTag, dateFilter, sort, venueType]);
 
     const visibleEvents = filteredEvents.slice(0, visibleCount);
 
@@ -64,12 +69,12 @@ export default function EventsBrowser({ initialEvents, trendingEvents }: EventsB
         if (node) observerRef.current.observe(node);
     }, [visibleCount, filteredEvents.length]);
 
-    useEffect(() => { setVisibleCount(5); }, [search, category, activeTag, dateFilter, sort]);
+    useEffect(() => { setVisibleCount(5); }, [search, category, activeTag, dateFilter, sort, venueType]);
 
     return (
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-5 items-start">
             <div className="lg:col-span-1">
-                <div className="sticky top-24 border-2 border-gray-200 bg-white relative overflow-y-auto h-[calc(100vh-8rem)] custom-scrollbar transition hover:border-charcoal-blue hover:shadow-[4px_4px_0px_0px_rgba(31,42,55,1)]">
+                <div className="sticky top-24 border-2 border-gray-200 bg-white relative overflow-y-auto max-h-[calc(100vh-8rem)] custom-scrollbar transition hover:border-charcoal-blue hover:shadow-[4px_4px_0px_0px_rgba(31,42,55,1)]">
                     <div className="absolute top-0 left-0 right-0 h-[3px] bg-muted-teal" />
                     <div className="px-5 py-3.5 border-b-2 border-gray-100 bg-gray-50 mt-[3px]">
                         <p className="text-[11px] font-bold tracking-widest uppercase text-charcoal-blue">Filters</p>
@@ -104,8 +109,8 @@ export default function EventsBrowser({ initialEvents, trendingEvents }: EventsB
                                         key={tag}
                                         onClick={() => setActiveTag(activeTag === tag ? '' : tag)}
                                         className={`px-2.5 py-1 text-[11px] font-bold tracking-wide border-2 transition-all ${activeTag === tag
-                                                ? 'bg-muted-teal border-muted-teal text-white'
-                                                : 'border-gray-200 text-steel-gray hover:border-muted-teal hover:text-muted-teal bg-white'
+                                            ? 'bg-muted-teal border-muted-teal text-white'
+                                            : 'border-gray-200 text-steel-gray hover:border-muted-teal hover:text-muted-teal bg-white'
                                             }`}
                                     >
                                         {tag}
@@ -124,12 +129,23 @@ export default function EventsBrowser({ initialEvents, trendingEvents }: EventsB
                                 ))}
                             </div>
                         </div>
-                        <button onClick={() => { setSearch(''); setCategory('All Events'); setActiveTag(''); setDateFilter('Any Date'); }} className="w-full border-2 border-gray-200 bg-white py-2 text-sm font-bold tracking-wider text-charcoal-blue hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all">Reset Filters</button>
+                        <div>
+                            <h3 className="mb-4 font-bold text-charcoal-blue">Venue</h3>
+                            <div className="space-y-2">
+                                {['Any Venue', 'Physical Location', 'Remote / Online'].map((label) => (
+                                    <label key={label} className="flex items-center space-x-3 cursor-pointer group hover:bg-gray-50 p-1 -ml-1 transition-colors">
+                                        <input type="radio" name="venueType" checked={venueType === label} onChange={() => setVenueType(label)} className="h-4 w-4 border-2 border-gray-400 text-charcoal-blue focus:ring-0 rounded-none checked:bg-charcoal-blue hover:border-gray-900 transition-colors" />
+                                        <span className={`text-sm tracking-wide ${venueType === label ? 'text-charcoal-blue font-bold' : 'text-steel-gray font-medium group-hover:text-charcoal-blue'}`}>{label}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                        <button onClick={() => { setSearch(''); setCategory('All Events'); setActiveTag(''); setDateFilter('Any Date'); setVenueType('Any Venue'); }} className="w-full border-2 border-gray-200 bg-white py-2 text-sm font-bold tracking-wider text-charcoal-blue hover:bg-gray-900 hover:text-white hover:border-gray-900 transition-all">Reset Filters</button>
                     </div>
                 </div>
             </div>
 
-            <div className="lg:col-span-3 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pr-2 pb-10 custom-scrollbar">
+            <div className="lg:col-span-3 pb-10">
                 <div className="flex items-center justify-between bg-white border-2 border-gray-200 px-5 py-4 mb-2 relative hover:border-gray-900 transition-colors">
                     <div className="absolute top-0 left-0 right-0 h-[3px] bg-muted-teal" />
                     <span className="text-sm font-bold text-steel-gray">Showing <strong className="font-extrabold text-charcoal-blue">{filteredEvents.length}</strong> events</span>
@@ -175,8 +191,12 @@ export default function EventsBrowser({ initialEvents, trendingEvents }: EventsB
                                                     <span className="text-charcoal-blue">{new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                                                 </div>
                                                 <div className="flex items-center gap-1.5">
-                                                    <svg className="h-3.5 w-3.5 text-muted-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                                    <span className="text-charcoal-blue">{event.displayLocation}</span>
+                                                    {event.isRemote ? (
+                                                        <svg className="h-3.5 w-3.5 text-muted-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
+                                                    ) : (
+                                                        <svg className="h-3.5 w-3.5 text-muted-teal" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                                    )}
+                                                    <span className="text-charcoal-blue">{event.isRemote ? 'Remote / Online' : event.displayLocation}</span>
                                                 </div>
                                                 {(event.tags ?? []).length > 0 && (
                                                     <div className="flex flex-wrap gap-1 mt-1 w-full">
@@ -185,8 +205,8 @@ export default function EventsBrowser({ initialEvents, trendingEvents }: EventsB
                                                                 key={tag}
                                                                 onClick={(e) => { e.preventDefault(); setActiveTag(activeTag === tag ? '' : tag); }}
                                                                 className={`px-2 py-0.5 text-[10px] font-bold border transition-all ${activeTag === tag
-                                                                        ? 'bg-muted-teal border-muted-teal text-white'
-                                                                        : 'border-gray-200 text-steel-gray hover:border-muted-teal hover:text-muted-teal'
+                                                                    ? 'bg-muted-teal border-muted-teal text-white'
+                                                                    : 'border-gray-200 text-steel-gray hover:border-muted-teal hover:text-muted-teal'
                                                                     }`}
                                                             >
                                                                 {tag}
@@ -245,13 +265,13 @@ export default function EventsBrowser({ initialEvents, trendingEvents }: EventsB
                         <div className="absolute top-0 left-0 right-0 h-[3px] bg-muted-teal" />
                         <h3 className="text-lg font-bold text-charcoal-blue">No matching events</h3>
                         <p className="mt-2 text-sm font-medium text-steel-gray">Try adjusting your search or filters.</p>
-                        <button onClick={() => { setSearch(''); setCategory('All Events'); setActiveTag(''); setDateFilter('Any Date'); }} className="mt-5 inline-block text-sm font-bold text-muted-teal hover:underline underline-offset-4 pointer-events-auto">Clear all filters</button>
+                        <button onClick={() => { setSearch(''); setCategory('All Events'); setActiveTag(''); setDateFilter('Any Date'); setVenueType('Any Venue') }} className="mt-5 inline-block text-sm font-bold text-muted-teal hover:underline underline-offset-4 pointer-events-auto">Clear all filters</button>
                     </div>
                 )}
             </div>
 
             <div className="lg:col-span-1">
-                <div className="sticky top-24 space-y-6 h-[calc(100vh-8rem)] overflow-y-auto pb-8 pr-2 custom-scrollbar">
+                <div className="sticky top-24 space-y-6 max-h-[calc(100vh-8rem)] overflow-y-auto pb-8 pr-2 custom-scrollbar">
                     <div className="bg-white border-2 border-gray-200 relative overflow-hidden transition hover:border-charcoal-blue hover:shadow-[4px_4px_0px_0px_rgba(31,42,55,1)]">
                         <div className="absolute top-0 left-0 right-0 h-[3px] bg-muted-teal" />
                         <div className="px-5 py-4 border-b-2 border-gray-100 bg-gray-50 mt-[3px]">

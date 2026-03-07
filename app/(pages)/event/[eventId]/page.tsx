@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { getServerSession } from "next-auth";
 import { getAuthOptions } from "@/lib/auth";
 import RegistrationModal from '@/components/RegistrationModal';
+import TeamCodeDisplay from '@/components/TeamCodeDisplay';
 import EventMap from '@/components/EventMap';
 import { fetchFromApi } from '@/lib/api-client';
 import { unpackEventDescription } from '@/lib/event-details';
@@ -40,6 +41,28 @@ export default async function EventDetailPage({
         ? event.participants.some((p: any) => p.id === session.user.id)
         : false;
 
+    // Fetch user's team for this event (if registered + team format)
+    const TEAM_FORMATS = ['Hackathon', 'Competition'];
+    let userTeam: any = null;
+    if (isRegistered && session?.user?.id && TEAM_FORMATS.includes(event.category)) {
+        try {
+            const ticket = await (await import('@/lib/prisma')).prisma.ticket.findFirst({
+                where: { eventId: event.id, userId: session.user.id },
+                include: {
+                    teamMembership: {
+                        include: {
+                            leader: { select: { id: true, name: true } },
+                            members: {
+                                include: { user: { select: { id: true, name: true } } }
+                            }
+                        }
+                    }
+                }
+            } as any);
+            userTeam = (ticket as any)?.teamMembership ?? null;
+        } catch { /* ignore if model not yet available */ }
+    }
+
     const eventDate = new Date(event.date);
     const dateStr = eventDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
     const timeStr = event.time || eventDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
@@ -58,6 +81,9 @@ export default async function EventDetailPage({
         fm.meetingLink || fm.recordingAvailable !== undefined ||
         fm.isRecurring || fm.recurringSchedule
     );
+
+    const teamSizeMax = fm.teamSizeMax ? parseInt(fm.teamSizeMax) : null;
+    const allowSolo = fm.allowSolo || false;
 
     return (
         <div className="min-h-screen bg-[#E8F8F5] font-sans text-steel-gray selection:bg-muted-teal selection:text-white pt-16">
@@ -103,7 +129,7 @@ export default async function EventDetailPage({
                 <div className="grid grid-cols-1 gap-10 lg:grid-cols-3 items-start">
 
                     {/* MAIN CONTENT */}
-                    <div className="lg:col-span-2 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pr-2 pb-10 custom-scrollbar">
+                    <div className="lg:col-span-2 lg:pr-2 pb-10">
 
                         {/* Hero Image */}
                         <div className="mb-8 aspect-video w-full overflow-hidden border-2 border-gray-200 bg-soft-slate relative">
@@ -388,7 +414,15 @@ export default async function EventDetailPage({
                                         <h3 className="text-xs font-bold uppercase tracking-widest text-charcoal-blue">Venue & Location</h3>
                                     </div>
                                     <div className="w-full bg-soft-slate/50 border-b-2 border-gray-100">
-                                        {coordinates ? (
+                                        {fm.isRemote ? (
+                                            <div className="aspect-video flex flex-col items-center justify-center text-steel-gray bg-[#E8F8F5] border-b-2 border-gray-100">
+                                                <svg className="h-12 w-12 text-muted-teal mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                                                </svg>
+                                                <span className="font-bold tracking-wider text-charcoal-blue">Online Event</span>
+                                                <span className="text-xs text-steel-gray/60 mt-1">Links shared with attendees</span>
+                                            </div>
+                                        ) : coordinates ? (
                                             <EventMap value={coordinates} readOnly={true} />
                                         ) : (
                                             <div className="aspect-video flex items-center justify-center text-sm text-steel-gray/40 font-medium">
@@ -397,7 +431,7 @@ export default async function EventDetailPage({
                                         )}
                                     </div>
                                     <div className="px-6 py-4">
-                                        <h4 className="font-bold text-charcoal-blue">{displayLocation}</h4>
+                                        <h4 className="font-bold text-charcoal-blue">{fm.isRemote ? 'Remote / Online' : displayLocation}</h4>
                                     </div>
                                 </div>
 
@@ -429,7 +463,7 @@ export default async function EventDetailPage({
                     </div>
 
                     {/* SIDEBAR */}
-                    <div className="lg:sticky lg:top-24 space-y-6 self-start lg:h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pr-2 pb-8 custom-scrollbar">
+                    <div className="lg:sticky lg:top-24 space-y-6 self-start lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pr-2 pb-8 custom-scrollbar">
 
                         {/* REGISTRATION CARD */}
                         <div className="border-2 border-gray-200 bg-white relative overflow-hidden transition hover:border-charcoal-blue hover:shadow-[6px_6px_0px_0px_rgba(31,42,55,1)]">
@@ -455,10 +489,13 @@ export default async function EventDetailPage({
                                     eventId={event.id}
                                     isFull={spotsLeft <= 0}
                                     isRegistered={isRegistered}
+                                    hasTeam={!!userTeam}
                                     eventCategory={event.category}
                                     eventTitle={event.title}
                                     isFree={isFree}
                                     price={event.price}
+                                    teamSizeMax={teamSizeMax}
+                                    allowSolo={allowSolo}
                                 />
                             </div>
 
@@ -531,8 +568,9 @@ export default async function EventDetailPage({
                                     {(fm.teamSizeMin || fm.teamSizeMax) && (
                                         <div className="flex items-center justify-between text-sm">
                                             <span className="text-steel-gray font-medium">Team Size</span>
-                                            <span className="font-bold text-charcoal-blue">
+                                            <span className="font-bold text-charcoal-blue text-right">
                                                 {fm.teamSizeMin && fm.teamSizeMax ? `${fm.teamSizeMin}–${fm.teamSizeMax}` : fm.teamSizeMin || fm.teamSizeMax}
+                                                {fm.allowSolo && <span className="block text-[10px] text-muted-teal/80">Solo allowed</span>}
                                             </span>
                                         </div>
                                     )}
@@ -565,6 +603,45 @@ export default async function EventDetailPage({
                                             <svg className="h-4 w-4 shrink-0 text-steel-gray" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                                             Recurring Event
                                         </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* TEAM CODE CARD — shown to leader at all times */}
+                        {userTeam && (
+                            <div className="border-2 border-charcoal-blue bg-charcoal-blue relative overflow-hidden">
+                                <div className="absolute top-0 left-0 right-0 h-[3px] bg-signal-orange" />
+                                <div className="px-5 py-3.5 border-b-2 border-white/10 mt-[3px]">
+                                    <h4 className="text-xs font-bold uppercase tracking-widest text-white/70">Your Team</h4>
+                                </div>
+                                <div className="px-5 py-4 space-y-3">
+                                    <div>
+                                        <p className="text-[11px] text-white/50 mb-0.5">Team Name</p>
+                                        <p className="text-base font-black text-white">{userTeam.name}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[11px] text-white/50 mb-1">Members ({userTeam.members.length}{teamSizeMax ? `/${teamSizeMax}` : ''})</p>
+                                        <div className="space-y-1">
+                                            {userTeam.members.map((m: any) => (
+                                                <div key={m.user.id} className="flex items-center gap-2 text-xs text-white/80">
+                                                    <span className={`h-1.5 w-1.5 rounded-full shrink-0 ${m.user.id === userTeam.leaderId ? 'bg-signal-orange' : 'bg-muted-teal'}`} />
+                                                    {m.user.name || 'Anonymous'}
+                                                    {m.user.id === userTeam.leaderId && <span className="text-[9px] font-bold text-signal-orange ml-1">LEADER</span>}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    {session?.user?.id === userTeam.leaderId && (
+                                        <div className="bg-white/5 border-2 border-white/10 px-4 py-3">
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1.5">Team Code — Share to invite</p>
+                                            <TeamCodeDisplay code={userTeam.code} />
+                                        </div>
+                                    )}
+                                    {session?.user?.id !== userTeam.leaderId && (
+                                        <p className="text-xs text-white/50 bg-white/5 border border-white/10 px-3 py-2">
+                                            Ask your team leader for the join code.
+                                        </p>
                                     )}
                                 </div>
                             </div>

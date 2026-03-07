@@ -14,9 +14,13 @@ export interface Speaker {
 
 // Format-specific metadata — different fields per event format
 export interface FormatMeta {
+    // General
+    isRemote?: boolean;
+
     // Hackathon / Competition
     teamSizeMin?: string;
     teamSizeMax?: string;
+    allowSolo?: boolean;
     prizePool?: string;
     submissionDeadline?: string;
     judgingCriteria?: string;
